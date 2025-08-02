@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCM Performance Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 5px;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 25px 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .metric-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .metric-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .savings-highlight {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            position: relative;
+        }
+        
+        .savings-highlight::before {
+            background: linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.4));
+        }
+        
+        .savings-highlight .metric-value {
+            color: white;
+            font-size: 24px;
+        }
+        
+        .savings-highlight .metric-label {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .chart-section {
+            padding: 25px 20px;
+            background: white;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .chart-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-small {
+            height: 200px;
+        }
+        
+        .performance-summary {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            margin: 0 20px 25px;
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid #0ea5e9;
+        }
+        
+        .summary-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0c4a6e;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .highlight-text {
+            color: #0c4a6e;
+            line-height: 1.6;
+        }
+        
+        .highlight-text p {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-size: 13px;
+        }
+        
+        .highlight-text p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .highlight-text strong {
+            color: #1e40af;
+            font-weight: 700;
+        }
+        
+        .status-banner {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-weight: 800;
+            font-size: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .status-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #6b7280;
+            background: #f8fafc;
+        }
+        
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: #dcfce7;
+            color: #166534;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 SCM Performance Dashboard</h1>
+            <p>Budget vs Actual Analysis • FY 2024-25</p>
+        </div>
+        
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-icon">🎯</div>
+                <div class="metric-value">₹81.44</div>
+                <div class="metric-label">Total Budget</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-icon">💳</div>
+                <div class="metric-value">₹69.83</div>
+                <div class="metric-label">Actual Spend</div>
+            </div>
+            
+            <div class="metric-card savings-highlight">
+                <div class="metric-icon">💎</div>
+                <div class="metric-value">₹11.61 Cr</div>
+                <div class="metric-label">Cost Savings (14.3%)</div>
+                <div class="trend-indicator">📈 Trending Down</div>
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <div class="chart-title">Monthly Performance Trend</div>
+            <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+        
+
+        
+        <div class="performance-summary">
+            <div class="summary-title">
+                🏆 Performance Highlights
+            </div>
+            <div class="highlight-text">
+                <p><strong>Supply Chain Excellence Delivered:</strong> SCM team achieved 14.3% cost savings (₹11.61 Cr) compared to allocated budget, demonstrating exceptional procurement efficiency and vendor management.</p>
+                
+                <p><strong>Consistent Performance:</strong> Successfully maintained under-budget operations for 9 out of 12 months, with strongest performance in Q4 (Apr-Jul) showing accelerating cost optimization initiatives.</p>
+                
+                <p><strong>Peak Savings Achievement:</strong> June 2025 recorded highest monthly savings of ₹3.16 Cr, reflecting effective strategic sourcing and operational efficiencies in peak retail season.</p>
+                
+                <p><strong>Future Outlook:</strong> Sustained cost discipline positions company for reinvestment opportunities in growth initiatives and market expansion strategies.</p>
+            </div>
+        </div>
+        
+        <div class="status-banner">
+            🎯 STRONG OPERATIONAL PERFORMANCE • COST TARGETS ACHIEVED
+        </div>
+        
+        <div class="footer">
+            📱 Mobile Optimized Dashboard • Updated Aug 2025
+        </div>
+    </div>
+
+    <script>
+        // Data
+        const months = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+        const budget = [6.76, 6.76, 6.91, 6.76, 6.70, 6.71, 6.81, 6.81, 6.81, 6.81, 6.81, 6.81];
+        const actual = [6.48, 7.26, 7.35, 6.58, 5.87, 5.76, 7.13, 5.81, 5.27, 4.52, 3.65, 4.15];
+        const variance = actual.map((val, i) => val - budget[i]);
+
+        // Trend Chart
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Budget',
+                    data: budget,
+                    borderColor: '#6b7280',
+                    backgroundColor: 'rgba(107, 114, 128, 0.1)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.4
+                }, {
+                    label: 'Actual',
+                    data: actual,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 3,
+                        max: 8,
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value;
+                            },
+                            font: {
+                                size: 11
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 11,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+
+        // Variance Chart - REMOVED
+    </script>
+</body>
+</html>
