@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCM Cost Performance Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.5; }
+            50% { transform: scale(1.1) rotate(180deg); opacity: 0.8; }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8fafc;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .savings { color: #059669; }
+        .total-budget { color: #dc2626; }
+        .total-provision { color: #7c3aed; }
+        .efficiency { color: #ea580c; }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .section h2 {
+            color: #1e293b;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .chart-section {
+            grid-column: span 2;
+        }
+
+        .expense-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .expense-table th,
+        .expense-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .expense-table th {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .expense-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            font-weight: 700;
+        }
+
+        .subcategory {
+            padding-left: 20px;
+            font-size: 0.9rem;
+        }
+
+        .total-row {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            font-weight: 700;
+        }
+
+        .savings-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .positive-savings {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .negative-savings {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        .month-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .month-btn {
+            padding: 8px 16px;
+            border: 2px solid #3b82f6;
+            background: white;
+            color: #3b82f6;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .month-btn:hover,
+        .month-btn.active {
+            background: #3b82f6;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .variance-cell {
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-section {
+                grid-column: span 1;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .metric-card {
+                padding: 15px;
+            }
+            
+            .metric-value {
+                font-size: 1.5rem;
+            }
+            
+            .section {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .expense-table {
+                font-size: 0.8rem;
+            }
+            
+            .expense-table th,
+            .expense-table td {
+                padding: 8px 4px;
+            }
+            
+            .subcategory {
+                padding-left: 10px;
+            }
+            
+            .month-selector {
+                gap: 5px;
+            }
+            
+            .month-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .dashboard-container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+            
+            .expense-table th,
+            .expense-table td {
+                padding: 6px 2px;
+                font-size: 0.7rem;
+            }
+            
+            .variance-cell {
+                font-size: 0.7rem;
+            }
+            
+            .savings-indicator {
+                padding: 2px 4px;
+                font-size: 0.6rem;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .metric-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>SCM Cost Performance Dashboard</h1>
+            <p>Budget vs Provision Analysis | August 2025 | Real-time Cost Monitoring</p>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value total-budget">₹6.21 Cr</div>
+                <div class="metric-label">Total Budget</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value total-provision">₹5.30 Cr</div>
+                <div class="metric-label">Total Provision</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value savings">₹0.91 Cr</div>
+                <div class="metric-label">Cost Savings</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value efficiency">85.4%</div>
+                <div class="metric-label">Budget Efficiency</div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="section">
+                <h2>📊 Fixed Expenses Breakdown</h2>
+                <table class="expense-table">
+                    <thead>
+                        <tr>
+                            <th>Expense Category</th>
+                            <th>Budget (₹ Cr)</th>
+                            <th>Provision (₹ Cr)</th>
+                            <th>Variance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Warehouse Rentals</td>
+                            <td>0.68</td>
+                            <td>0.68</td>
+                            <td><span class="savings-indicator positive-savings">On Track</span></td>
+                        </tr>
+                        <tr>
+                            <td>Labour Charges</td>
+                            <td>2.08</td>
+                            <td>1.52</td>
+                            <td class="variance-cell savings">-₹0.56 Cr</td>
+                        </tr>
+                        <tr>
+                            <td>Security Charges</td>
+                            <td>0.21</td>
+                            <td>0.21</td>
+                            <td><span class="savings-indicator positive-savings">On Track</span></td>
+                        </tr>
+                        <tr>
+                            <td>Pallet Hire Charges</td>
+                            <td>0.02</td>
+                            <td>0.02</td>
+                            <td><span class="savings-indicator positive-savings">On Track</span></td>
+                        </tr>
+                        <tr>
+                            <td>Repair & Maintenance</td>
+                            <td>0.12</td>
+                            <td>0.12</td>
+                            <td><span class="savings-indicator positive-savings">On Track</span></td>
+                        </tr>
+                        <tr>
+                            <td>Communication Charges</td>
+                            <td>0.00</td>
+                            <td>0.00</td>
+                            <td><span class="savings-indicator positive-savings">On Track</span></td>
+                        </tr>
+                        <tr>
+                            <td>HouseKeeping Charges</td>
+                            <td>0.18</td>
+                            <td>0.12</td>
+                            <td class="variance-cell savings">-₹0.06 Cr</td>
+                        </tr>
+                        <tr>
+                            <td>Staff Welfare</td>
+                            <td>0.05</td>
+                            <td>0.04</td>
+                            <td class="variance-cell savings">-₹0.01 Cr</td>
+                        </tr>
+                        <tr>
+                            <td>Water Charges</td>
+                            <td>0.03</td>
+                            <td>0.01</td>
+                            <td class="variance-cell savings">-₹0.02 Cr</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td><strong>Fixed Expenses Total</strong></td>
+                            <td><strong>3.38</strong></td>
+                            <td><strong>2.73</strong></td>
+                            <td><strong>-₹0.65 Cr</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>📈 Variable Expenses Analysis</h2>
+                <table class="expense-table">
+                    <thead>
+                        <tr>
+                            <th>Expense Category</th>
+                            <th>Budget (₹ Cr)</th>
+                            <th>Provision (₹ Cr)</th>
+                            <th>Variance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="category-header">
+                            <td colspan="4">Variable - I / Freight</td>
+                        </tr>
+                        <tr>
+                            <td class="subcategory">FTL Freight</td>
+                            <td>1.87</td>
+                            <td>1.42</td>
+                            <td class="variance-cell savings">-₹0.45 Cr</td>
+                        </tr>
+                        <tr>
+                            <td class="subcategory">Other Than FTL</td>
+                            <td>0.14</td>
+                            <td>0.42</td>
+                            <td class="variance-cell" style="color: #dc2626;">+₹0.28 Cr</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Freight Total</strong></td>
+                            <td><strong>2.01</strong></td>
+                            <td><strong>1.84</strong></td>
+                            <td class="variance-cell savings"><strong>-₹0.17 Cr</strong></td>
+                        </tr>
+                        <tr class="category-header">
+                            <td colspan="4">Variable - II / Others</td>
+                        </tr>
+                        <tr>
+                            <td class="subcategory">Labour Mathadi</td>
+                            <td>0.15</td>
+                            <td>0.09</td>
+                            <td class="variance-cell savings">-₹0.06 Cr</td>
+                        </tr>
+                        <tr>
+                            <td class="subcategory">Electricity Cost</td>
+                            <td>0.14</td>
+                            <td>0.14</td>
+                            <td><span class="savings-indicator positive-savings">On Track</span></td>
+                        </tr>
+                        <tr>
+                            <td class="subcategory">Packing Material Cost</td>
+                            <td>0.40</td>
+                            <td>0.40</td>
+                            <td><span class="savings-indicator positive-savings">On Track</span></td>
+                        </tr>
+                        <tr>
+                            <td class="subcategory">Job Work</td>
+                            <td>0.11</td>
+                            <td>0.07</td>
+                            <td class="variance-cell savings">-₹0.04 Cr</td>
+                        </tr>
+                        <tr>
+                            <td class="subcategory">Printing & Stationary</td>
+                            <td>0.03</td>
+                            <td>0.03</td>
+                            <td><span class="savings-indicator positive-savings">On Track</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Others Total</strong></td>
+                            <td><strong>0.82</strong></td>
+                            <td><strong>0.73</strong></td>
+                            <td class="variance-cell savings"><strong>-₹0.09 Cr</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section chart-section">
+                <h2>📊 Visual Cost Analysis</h2>
+                <div class="month-selector">
+                    <button class="month-btn active" onclick="updateChart('current')">Current Month</button>
+                    <button class="month-btn" onclick="updateChart('trend')">Cost Trend</button>
+                    <button class="month-btn" onclick="updateChart('category')">Category Breakdown</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="costChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chart;
+        const ctx = document.getElementById('costChart').getContext('2d');
+
+        const chartData = {
+            current: {
+                type: 'bar',
+                data: {
+                    labels: ['Fixed Expenses', 'Variable Expenses'],
+                    datasets: [{
+                        label: 'Budget',
+                        data: [3.38, 2.83],
+                        backgroundColor: 'rgba(220, 38, 38, 0.8)',
+                        borderColor: 'rgba(220, 38, 38, 1)',
+                        borderWidth: 2
+                    }, {
+                        label: 'Provision',
+                        data: [2.73, 2.57],
+                        backgroundColor: 'rgba(124, 58, 237, 0.8)',
+                        borderColor: 'rgba(124, 58, 237, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Budget vs Provision Comparison - August 2025 (₹ Crores)',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            color: 'white',
+                            font: {
+                                weight: 'bold'
+                            },
+                            formatter: function(value) {
+                                return '₹' + value + 'Cr';
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount (₹ Crores)'
+                            }
+                        }
+                    }
+                }
+            },
+            trend: {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                    datasets: [{
+                        label: 'Budget',
+                        data: [6.2, 6.3, 6.1, 6.4, 6.2, 6.21, 6.18, 6.21],
+                        borderColor: 'rgba(220, 38, 38, 1)',
+                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Actual Spend',
+                        data: [5.1, 5.4, 5.2, 5.6, 5.1, 5.30, 5.25, 5.30],
+                        borderColor: 'rgba(124, 58, 237, 1)',
+                        backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Cost Trend Analysis - Jan to Aug 2025 (₹ Crores)',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                            borderColor: 'rgba(0, 0, 0, 0.2)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            color: 'black',
+                            font: {
+                                size: 10,
+                                weight: 'bold'
+                            },
+                            formatter: function(value) {
+                                return '₹' + value;
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount (₹ Crores)'
+                            }
+                        }
+                    }
+                }
+            },
+            category: {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fixed Expenses', 'Variable Expenses'],
+                    datasets: [{
+                        data: [2.73, 2.57],
+                        backgroundColor: [
+                            'rgba(124, 58, 237, 0.8)',
+                            'rgba(59, 130, 246, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(124, 58, 237, 1)',
+                            'rgba(59, 130, 246, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Cost Distribution - August 2025 (₹ Crores)',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            color: 'white',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            formatter: function(value, context) {
+                                const percentage = ((value / 5.30) * 100).toFixed(1);
+                                return '₹' + value + 'Cr\n(' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        function updateChart(type) {
+            // Update active button
+            document.querySelectorAll('.month-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Destroy existing chart
+            if (chart) {
+                chart.destroy();
+            }
+
+            // Create new chart
+            chart = new Chart(ctx, chartData[type]);
+        }
+
+        // Initialize with current month data
+        Chart.register(ChartDataLabels);
+        chart = new Chart(ctx, chartData.current);
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.metric-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            const sections = document.querySelectorAll('.section');
+            sections.forEach((section, index) => {
+                section.style.animationDelay = `${index * 0.2}s`;
+            });
+        });
+    </script>
+</body>
+</html>
