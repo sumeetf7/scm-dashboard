@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management Standard Operating Procedure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.05)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+        
+        .section:nth-child(1) { animation-delay: 0.1s; }
+        .section:nth-child(2) { animation-delay: 0.2s; }
+        .section:nth-child(3) { animation-delay: 0.3s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+            position: relative;
+        }
+        
+        .section-title::before {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: #e74c3c;
+        }
+        
+        .flowchart {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            transition: transform 0.3s ease;
+        }
+        
+        .flow-step:hover {
+            transform: translateX(10px);
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 20px;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .step-content {
+            flex: 1;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .step-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .step-description {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .responsibility-matrix {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        
+        .matrix-header {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+        
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .matrix-table th {
+            background: #ecf0f1;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 2px solid #bdc3c7;
+        }
+        
+        .matrix-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+            transition: background-color 0.3s ease;
+        }
+        
+        .matrix-table tr:hover td {
+            background-color: #f8f9fa;
+        }
+        
+        .pod-intro {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+        }
+        
+        .pod-definition {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .definition-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .definition-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .card-header h4 {
+            margin: 0;
+            font-size: 1.1em;
+        }
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .definition-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .definition-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .definition-list li:before {
+            content: '▸';
+            color: #3498db;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .definition-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .frequency-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .timeline-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8em;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .timeline-badge.pilot {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .timeline-badge.ongoing {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+        }
+        
+        .pod-flowchart {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border-radius: 15px;
+        }
+        
+        .audit-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .audit-step {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .audit-step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .decision-step {
+            border: 2px solid #f39c12;
+        }
+        
+        .step-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .step-desc {
+            font-size: 0.8em;
+            color: #7f8c8d;
+        }
+        
+        .flow-arrow {
+            font-size: 1.5em;
+            color: #3498db;
+            margin: 0 5px;
+        }
+        
+        .pod-responsibilities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .team-responsibility-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            min-height: 280px;
+        }
+        
+        .team-header {
+            padding: 20px;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .scm-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .ops-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .mgmt-header {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+        
+        .responsibility-content {
+            padding: 25px;
+            height: calc(100% - 70px);
+        }
+        
+        .responsibility-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .responsibility-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #ecf0f1;
+            position: relative;
+            padding-left: 30px;
+            line-height: 1.4;
+        }
+        
+        .responsibility-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .responsibility-list li:before {
+            content: '✓';
+            color: #27ae60;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            background: #d5f4e6;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            top: 12px;
+        }
+        
+        .timeline-compliance {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .compliance-grid {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .compliance-item {
+            text-align: center;
+            background: white;
+            padding: 30px 25px;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            min-width: 160px;
+        }
+        
+        .compliance-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .compliance-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #e74c3c;
+            line-height: 1;
+        }
+        
+        .compliance-label {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        
+        .compliance-desc {
+            font-size: 0.85em;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+            padding: 20px;
+        }
+        
+        .raci-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .legend-color.responsible { background: #e74c3c; }
+        .legend-color.accountable { background: #3498db; }
+        .legend-color.consulted { background: #f39c12; }
+        .legend-color.informed { background: #27ae60; }
+        
+        .raci-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        .raci-table th {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            border: 1px solid #2c3e50;
+        }
+        
+        .raci-table td {
+            padding: 15px;
+            border: 1px solid #ecf0f1;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .raci-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+            background: #f8f9fa;
+        }
+        
+        .raci-table tr:hover td {
+            background-color: #ebf3fd;
+            transform: scale(1.01);
+        }
+        
+        .raci-badge {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+            line-height: 35px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .raci-badge:hover {
+            transform: scale(1.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .raci-badge.responsible { 
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .raci-badge.accountable { 
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .raci-badge.consulted { 
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+        
+        .raci-badge.informed { 
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+        
+        .decision-diamond {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+            transform: rotate(45deg);
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            box-shadow: 0 10px 20px rgba(243, 156, 18, 0.3);
+        }
+        
+        .decision-text {
+            transform: rotate(-45deg);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .arrow {
+            text-align: center;
+            font-size: 2em;
+            color: #3498db;
+            margin: 10px 0;
+        }
+        
+        .branch {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        
+        .branch-item {
+            flex: 1;
+            margin: 0 10px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #ecf0f1;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .branch-item:hover {
+            border-color: #3498db;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .branch-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .version-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #34495e;
+        }
+        
+                        @media (max-width: 768px) {
+            .branch, .audit-flow {
+                flex-direction: column;
+            }
+            
+            .branch-item, .audit-step {
+                margin: 10px 0;
+            }
+            
+            .flow-arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+            
+            .pod-definition, .pod-responsibilities, .compliance-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 EBO/SIS/MBF Management SOP</h1>
+            <p>Standard Operating Procedure for Order Processing & POD Control</p>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">🔄 Order Processing Flowchart</h2>
+                <div class="flowchart">
+                    <div class="flow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Sales Order Generation</div>
+                            <div class="step-description">Initial sales order is created in the system</div>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">⬇️</div>
+                    
+                    <div class="decision-diamond">
+                        <div class="decision-text">PO vs Non-PO?</div>
+                    </div>
+                    
+                    <div class="branch">
+                        <div class="branch-item">
+                            <div class="branch-title">🟢 PO Order Path</div>
+                            <div class="flow-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Wait for PO</div>
+                                    <div class="step-description">Continuously remind Brand for PO and follow further dispatch process</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="branch-item">
+                            <div class="branch-title">🔴 Non-PO Path</div>
+                            <div class="flow-step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-title">Direct Dispatch</div>
+                                    <div class="step-description">Align picking and dispatch on FIFO basis without delays</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">⬇️</div>
+                    
+                    <div class="flow-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Email Communication</div>
+                            <div class="step-description">Proper email communication for all dispatched consignments</div>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">⬇️</div>
+                    
+                    <div class="flow-step">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <div class="step-title">GRN Tracking & Updates</div>
+                            <div class="step-description">Track delivery and update MIS for discrepancies</div>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">⬇️</div>
+                    
+                    <div class="flow-step">
+                        <div class="step-number">7</div>
+                        <div class="step-content">
+                            <div class="step-title">Partner GRN Process</div>
+                            <div class="step-description">GRN completion within 48 hours with discrepancy reporting</div>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">⬇️</div>
+                    
+                    <div class="flow-step">
+                        <div class="step-number">8</div>
+                        <div class="step-content">
+                            <div class="step-title">Claims & Discrepancy Management</div>
+                            <div class="step-description">Handle tickets, INF tracking, and discrepancy reporting</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">📋 POD Audit Process</h2>
+                <div class="flowchart">
+                    <div class="pod-intro">
+                        <h3 style="color: #2c3e50; margin-bottom: 15px; text-align: center;">🎯 Proof of Delivery (POD) Audit Implementation</h3>
+                        <p style="text-align: center; color: #7f8c8d; font-style: italic; margin-bottom: 30px;">
+                            Enhancing control over LSP partners through comprehensive POD verification and accountability measures
+                        </p>
+                    </div>
+                    
+                    <div class="pod-definition">
+                        <div class="definition-card">
+                            <div class="card-header">
+                                <h4>🔍 What is POD Audit?</h4>
+                            </div>
+                            <div class="card-content">
+                                <ul class="definition-list">
+                                    <li>All received PODs from LSP Partners undergo rechecking and cross-verification by Bestseller Outward team</li>
+                                    <li>Each POD is reviewed to verify store stamps and operational remarks</li>
+                                    <li><strong>Clean POD:</strong> No remarks noted, indicating no wear/tear or discrepancies</li>
+                                    <li><strong>Clear POD:</strong> Clean PODs reviewed by Operations Team with no additional remarks</li>
+                                    <li>Comprehensive review ensures missing remarks are captured before final approval</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="definition-card">
+                            <div class="card-header">
+                                <h4>🎯 Why POD Audit is Required?</h4>
+                            </div>
+                            <div class="card-content">
+                                <ul class="definition-list">
+                                    <li>Enhance control over LSP partners through clear, documented processes</li>
+                                    <li>Streamline operations while ensuring accountability and transparency</li>
+                                    <li>Improve stock acceptance accuracy with clear POD remarks and stamps</li>
+                                    <li>Establish comprehensive tracking and quality control measures</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="definition-card">
+                            <div class="card-header">
+                                <h4>📅 Audit Frequency</h4>
+                            </div>
+                            <div class="card-content">
+                                <div class="frequency-timeline">
+                                    <div class="timeline-item">
+                                        <div class="timeline-badge pilot">PILOT</div>
+                                        <div class="timeline-content">
+                                            <strong>Initial Phase:</strong> Complete 1 Month Report (June)
+                                        </div>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="timeline-badge ongoing">ONGOING</div>
+                                        <div class="timeline-content">
+                                            <strong>Regular Frequency:</strong> Every 10 Days
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pod-flowchart">
+                        <h4 style="text-align: center; color: #2c3e50; margin-bottom: 20px;">📊 POD Audit Process Flow</h4>
+                        <div class="audit-flow">
+                            <div class="audit-step">
+                                <div class="step-icon">📦</div>
+                                <div class="step-title">POD Receipt</div>
+                                <div class="step-desc">LSP Partners submit PODs</div>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="audit-step">
+                                <div class="step-icon">🔍</div>
+                                <div class="step-title">SCM Review</div>
+                                <div class="step-desc">Verify stamps & remarks</div>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="audit-step decision-step">
+                                <div class="step-icon">❓</div>
+                                <div class="step-title">Classification</div>
+                                <div class="step-desc">Clean/Clear/Remarked POD</div>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="audit-step">
+                                <div class="step-icon">👥</div>
+                                <div class="step-title">Operations Review</div>
+                                <div class="step-desc">7-day review period</div>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="audit-step">
+                                <div class="step-icon">✅</div>
+                                <div class="step-title">Final Approval</div>
+                                <div class="step-desc">Clear POD Status</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                    
+            <div class="section">
+                <h2 class="section-title">👥 POD Audit Responsibility Matrix</h2>
+                <div class="responsibility-matrix">
+                    <div class="matrix-header">
+                        POD Audit - Team Responsibilities & Expectations
+                    </div>
+                    <div class="raci-container">
+                        <div class="pod-responsibilities">
+                            <div class="team-responsibility-card">
+                                <div class="team-header scm-header">
+                                    <h4>🏢 SCM Team Responsibilities</h4>
+                                </div>
+                                <div class="responsibility-content">
+                                    <ul class="responsibility-list">
+                                        <li>Conduct thorough review of all POD documents</li>
+                                        <li>Focus on identifying remarks and stamps on PODs</li>
+                                        <li>Categorize each POD: Clean POD, Clear POD, or POD with Remark</li>
+                                        <li>Cross-verify with LSP Partner submissions</li>
+                                        <li>Generate audit reports every 10 days</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="team-responsibility-card">
+                                <div class="team-header ops-header">
+                                    <h4>🏪 Operations/Store Team Responsibilities</h4>
+                                </div>
+                                <div class="responsibility-content">
+                                    <ul class="responsibility-list">
+                                        <li>Conduct thorough stock acceptance checks</li>
+                                        <li>Provide clear remarks and stamps on PODs during stock acceptance</li>
+                                        <li>Review all Clean PODs within 7-day period</li>
+                                        <li>Communicate discrepancies to DC Outward & Discrepancy Team</li>
+                                        <li>Maintain accuracy and quality standards</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="team-responsibility-card">
+                                <div class="team-header mgmt-header">
+                                    <h4>👔 Area/City Manager Responsibilities</h4>
+                                </div>
+                                <div class="responsibility-content">
+                                    <ul class="responsibility-list">
+                                        <li>Provide clear justification for late discrepancy submissions (after 7 days)</li>
+                                        <li>Approve case closures for delayed discrepancies</li>
+                                        <li>Ensure team compliance with POD audit timelines</li>
+                                        <li>Oversee audit process effectiveness</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-compliance">
+                            <h4 style="text-align: center; color: #e74c3c; margin: 30px 0 20px 0;">⏰ Critical Timelines</h4>
+                            <div class="compliance-grid">
+                                <div class="compliance-item">
+                                    <div class="compliance-number">7</div>
+                                    <div class="compliance-label">Days</div>
+                                    <div class="compliance-desc">Operations Team Review Period</div>
+                                </div>
+                                <div class="compliance-item">
+                                    <div class="compliance-number">10</div>
+                                    <div class="compliance-label">Days</div>
+                                    <div class="compliance-desc">Regular Audit Report Frequency</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">👥 Order Processing Responsibility Matrix</h2>
+                <div class="responsibility-matrix">
+                    <div class="matrix-header">
+                        RACI Matrix - Team Responsibilities
+                    </div>
+                    <div class="raci-container">
+                        <div class="raci-legend">
+                            <div class="legend-item">
+                                <span class="legend-color responsible"></span>
+                                <span>R - Responsible</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color accountable"></span>
+                                <span>A - Accountable</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color consulted"></span>
+                                <span>C - Consulted</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color informed"></span>
+                                <span>I - Informed</span>
+                            </div>
+                        </div>
+                        
+                        <table class="raci-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50%;">Activity</th>
+                                    <th style="width: 25%;">Brand Team</th>
+                                    <th style="width: 25%;">SCM Team</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Sales Order Generation</td>
+                                    <td><span class="raci-badge responsible">R</span></td>
+                                    <td><span class="raci-badge informed">I</span></td>
+                                </tr>
+                                <tr>
+                                    <td>PO vs Non-PO Identification</td>
+                                    <td><span class="raci-badge responsible">R</span></td>
+                                    <td><span class="raci-badge consulted">C</span></td>
+                                </tr>
+                                <tr>
+                                    <td>PO Follow-up & Dispatch Process</td>
+                                    <td><span class="raci-badge accountable">A</span></td>
+                                    <td><span class="raci-badge responsible">R</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Non-PO Picking & Dispatch (FIFO)</td>
+                                    <td><span class="raci-badge informed">I</span></td>
+                                    <td><span class="raci-badge responsible">R</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Email Communication for Dispatches</td>
+                                    <td><span class="raci-badge consulted">C</span></td>
+                                    <td><span class="raci-badge responsible">R</span></td>
+                                </tr>
+                                <tr>
+                                    <td>GRN Tracking & MIS Updates</td>
+                                    <td><span class="raci-badge informed">I</span></td>
+                                    <td><span class="raci-badge responsible">R</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Partner GRN (48hrs) & Discrepancy Reporting</td>
+                                    <td><span class="raci-badge responsible">R</span></td>
+                                    <td><span class="raci-badge consulted">C</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Claims & Tickets Management</td>
+                                    <td><span class="raci-badge informed">I</span></td>
+                                    <td><span class="raci-badge responsible">R</span></td>
+                                </tr>
+                                <tr>
+                                    <td>INF Tracking & Alignment</td>
+                                    <td><span class="raci-badge consulted">C</span></td>
+                                    <td><span class="raci-badge responsible">R</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Discrepancy Communication via Email</td>
+                                    <td><span class="raci-badge informed">I</span></td>
+                                    <td><span class="raci-badge responsible">R</span></td>
+                                </tr>
+                                <tr>
+                                    <td>MIS Maintenance & Circulation</td>
+                                    <td><span class="raci-badge informed">I</span></td>
+                                    <td><span class="raci-badge responsible">R</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Forward Discrepancy Reporting</td>
+                                    <td><span class="raci-badge responsible">R</span></td>
+                                    <td><span class="raci-badge consulted">C</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-title">📋 Key Guidelines</h2>
+                <div class="flowchart">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <div class="step-content" style="border-left-color: #e74c3c;">
+                            <div class="step-title">🕒 Time-Critical Actions</div>
+                            <div class="step-description">
+                                • GRN completion within 48 hours<br>
+                                • Continuous PO follow-up for pending orders<br>
+                                • FIFO basis dispatch for Non-PO orders
+                            </div>
+                        </div>
+                        
+                        <div class="step-content" style="border-left-color: #f39c12;">
+                            <div class="step-title">📧 Communication Protocol</div>
+                            <div class="step-description">
+                                • All dispatches require email communication<br>
+                                • Discrepancy reporting via discrepancy.sis@bestseller.com<br>
+                                • MIS circulation to all stakeholders every EoD
+                            </div>
+                        </div>
+                        
+                        <div class="step-content" style="border-left-color: #27ae60;">
+                            <div class="step-title">🔍 Quality Control</div>
+                            <div class="step-description">
+                                • Track short/torn/soiled/damaged boxes<br>
+                                • Maintain proper MIS documentation<br>
+                                • Follow STRICT discrepancy reporting protocol
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <h3>📊 EBO/SIS/MBF Management & POD Audit SOP</h3>
+            <div class="version-info">
+                <div>Version 2.0 | Enhanced with POD Audit Process</div>
+                <div>Last Updated: August 2025</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add smooth scrolling animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.section').forEach(section => {
+                observer.observe(section);
+            });
+            
+            // Add hover effects to flow steps
+            document.querySelectorAll('.flow-step').forEach(step => {
+                step.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(10px) scale(1.02)';
+                });
+                
+                step.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
